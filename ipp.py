@@ -146,7 +146,6 @@ st.markdown("---")
 # -----------------------------------
 # Prediction Section
 # -----------------------------------
-if st.button("🧾 Generate Medical Report"):
 
     input_data = [[age, gender, fever, cough, headache,
                    soreThroat, bodyPain, vomiting, rash, breathing]]
@@ -308,3 +307,4 @@ st.write("""
 - Connect with hospital database
 - Convert into mobile application
 """)
+
