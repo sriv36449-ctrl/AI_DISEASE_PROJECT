@@ -5,41 +5,29 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from datetime import datetime
 
-# -----------------------------------
-# Page Configuration (MUST BE FIRST)
-# -----------------------------------
+# -------------------------
+# PAGE CONFIG
+# -------------------------
 st.set_page_config(
-    page_title="AI Disease Prediction System",
-    page_icon="🩺",
+    page_title="AI Healthcare System",
+    page_icon="??",
     layout="wide"
 )
 
-st.title("🩺 AI-Based Disease Prediction System")
-st.markdown("### Predict diseases using Machine Learning")
+st.title("?? AI-Based Disease Prediction System")
+st.markdown("### Predict common diseases based on patient symptoms using AI")
 st.markdown("---")
 
-# -----------------------------------
-# Sidebar Section
-# -----------------------------------
-st.sidebar.header("📌 Project Information")
-
-st.sidebar.markdown("""
-**Project Title:** AI Healthcare Disease Prediction  
-**Technology Used:** Python, Streamlit, Scikit-learn  
-**Algorithm Used:** Random Forest Classifier  
-**Developed By:** Vaishnavy,srimathi,sri vaishnavi 
-""")
-
-# -----------------------------------
-# Load Dataset
-# -----------------------------------
+# -------------------------
+# LOAD DATA
+# -------------------------
 @st.cache_data
 def load_data():
     return pd.read_csv("disease_data.csv")
 
 data = load_data()
 
-# Encode disease column
+# Encode disease labels
 le = LabelEncoder()
 data["Disease"] = le.fit_transform(data["Disease"])
 
@@ -50,261 +38,142 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-model = RandomForestClassifier()
+model = RandomForestClassifier(random_state=42)
 model.fit(X_train, y_train)
 
 accuracy = model.score(X_test, y_test)
 
-st.sidebar.success(f"Model Accuracy: {accuracy*100:.2f}%")
+# -------------------------
+# SIDEBAR INFO
+# -------------------------
+st.sidebar.header("?? Project Info")
+st.sidebar.write("Algorithm: Random Forest Classifier")
+st.sidebar.write(f"Model Accuracy: {accuracy*100:.2f}%")
+st.sidebar.write("Purpose: Educational only")
 
-# -----------------------------------
-# Patient Input Section
-# -----------------------------------
-import streamlit as st
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
-from datetime import datetime
-
-# -----------------------------------
-# Page Configuration (MUST BE FIRST)
-# -----------------------------------
-st.set_page_config(
-    page_title="AI Disease Prediction System",
-    page_icon="🩺",
-    layout="wide"
-)
-
-st.title("🩺 AI-Based Disease Prediction System")
-st.markdown("### Predict diseases using Machine Learning")
-st.markdown("---")
-
-# -----------------------------------
-# Sidebar Section
-# -----------------------------------
-st.sidebar.header("📌 Project Information")
-
-st.sidebar.markdown("""
-**Project Title:** AI Healthcare Disease Prediction  
-**Technology Used:** Python, Streamlit, Scikit-learn  
-**Algorithm Used:** Random Forest Classifier  
-**Developed By:** Vaishnavy  
-""")
-
-# -----------------------------------
-# Load Dataset
-# -----------------------------------
-@st.cache_data
-def load_data():
-    return pd.read_csv("disease_data.csv")
-
-data = load_data()
-
-# Encode disease column
-le = LabelEncoder()
-data["Disease"] = le.fit_transform(data["Disease"])
-
-X = data.drop("Disease", axis=1)
-y = data["Disease"]
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
-
-accuracy = model.score(X_test, y_test)
-
-st.sidebar.success(f"Model Accuracy: {accuracy*100:.2f}%")
-
-# -----------------------------------
-# Patient Input Section
-# -----------------------------------
-st.subheader("👤 Enter Patient Details")
+# -------------------------
+# INPUT SECTION
+# -------------------------
+st.subheader("?? Enter Patient Details")
 
 col1, col2 = st.columns(2)
 
 with col1:
     name = st.text_input("Patient Name")
     age = st.number_input("Age", 1, 100)
-    gender = st.selectbox("Gender (0 = Female, 1 = Male)", [0, 1])
-    fever = st.selectbox("Fever", [0, 1])
-    cough = st.selectbox("Cough", [0, 1])
+    gender_option = st.selectbox("Gender", ["Female", "Male"])
+    gender = 1 if gender_option == "Male" else 0
+    fever = 1 if st.selectbox("Fever", ["No", "Yes"]) == "Yes" else 0
+    cough = 1 if st.selectbox("Cough", ["No", "Yes"]) == "Yes" else 0
 
 with col2:
-    headache = st.selectbox("Headache", [0, 1])
-    soreThroat = st.selectbox("Sore Throat", [0, 1])
-    bodyPain = st.selectbox("Body Pain", [0, 1])
-    vomiting = st.selectbox("Vomiting", [0, 1])
-    rash = st.selectbox("Rash", [0, 1])
-    breathing = st.selectbox("Breathing Problem", [0, 1])
+    headache = 1 if st.selectbox("Headache", ["No", "Yes"]) == "Yes" else 0
+    soreThroat = 1 if st.selectbox("Sore Throat", ["No", "Yes"]) == "Yes" else 0
+    bodyPain = 1 if st.selectbox("Body Pain", ["No", "Yes"]) == "Yes" else 0
+    vomiting = 1 if st.selectbox("Vomiting", ["No", "Yes"]) == "Yes" else 0
+    rash = 1 if st.selectbox("Rash", ["No", "Yes"]) == "Yes" else 0
+    breathing = 1 if st.selectbox("Breathing Problem", ["No", "Yes"]) == "Yes" else 0
 
 st.markdown("---")
 
-# -----------------------------------
-# Prediction Section
-# -----------------------------------
+# -------------------------
+# PREDICTION
+# -------------------------
+if st.button("?? Generate Medical Report"):
 
-    input_data = [[age, gender, fever, cough, headache,
-                   soreThroat, bodyPain, vomiting, rash, breathing]]
+    if name.strip() == "":
+        st.warning("?? Please enter the patient name")
+    else:
+        # Prepare input
+        input_data = [[age, gender, fever, cough, headache,
+                       soreThroat, bodyPain, vomiting, rash, breathing]]
 
-    prediction = model.predict(input_data)
-    disease = le.inverse_transform(prediction)[0]
+        # Predict disease
+        prediction = model.predict(input_data)
+        disease = le.inverse_transform(prediction)[0]
 
-    # Prescription dictionary
-    prescription_dict = {
-        "COVID-19": "Isolation, Paracetamol, Steam inhalation, Doctor consultation",
-        "Dengue": "Hydration, Paracetamol (No aspirin), Rest",
-        "Malaria": "Antimalarial drugs, Hydration, Doctor supervision",
-        "Flu": "Rest, Fluids, Paracetamol",
-        "Cold": "Steam inhalation, Warm fluids, Rest",
-        "Typhoid": "Antibiotics (Doctor prescribed), Hydration, Soft diet"
-    }
+        # Prediction confidence
+        confidence = model.predict_proba(input_data).max() * 100
 
-    prescription = prescription_dict.get(disease, "Consult Doctor")
+        # Prescription dictionary
+        prescription_dict = {
+            "COVID-19": ["Isolation", "Paracetamol", "Steam inhalation", "Doctor consultation"],
+            "Dengue": ["Hydration", "Paracetamol (No aspirin)", "Rest"],
+            "Malaria": ["Antimalarial drugs", "Hydration", "Doctor supervision"],
+            "Flu": ["Rest", "Fluids", "Paracetamol"],
+            "Cold": ["Steam inhalation", "Warm fluids", "Rest"],
+            "Typhoid": ["Antibiotics (Doctor prescribed)", "Hydration", "Soft diet"]
+        }
+        prescription = prescription_dict.get(disease, ["Consult Doctor"])
 
-    st.success("Prediction Complete ✅")
+        # -------------------------
+        # DISPLAY REPORT
+        # -------------------------
+        st.success("? Prediction Complete")
 
-    # -----------------------------------
-    # Report Section
-    # -----------------------------------
-    st.subheader("📋 Medical Report")
+        st.subheader("?? Medical Report")
+        st.write(f"**Date:** {datetime.now().strftime('%d-%m-%Y %H:%M')}")
+        st.write(f"**Patient Name:** {name}")
+        st.write(f"**Age:** {age}")
+        st.write(f"**Gender:** {gender_option}")
 
-    st.write("Date:", datetime.now().strftime("%d-%m-%Y %H:%M"))
-    st.write("Patient Name:", name)
-    st.write("Age:", age)
-    st.write("Predicted Disease:", disease)
+        st.write("**Symptoms:**")
+        st.write(f"Fever: {'Yes' if fever else 'No'} | Cough: {'Yes' if cough else 'No'} | Headache: {'Yes' if headache else 'No'}")
+        st.write(f"Sore Throat: {'Yes' if soreThroat else 'No'} | Body Pain: {'Yes' if bodyPain else 'No'} | Vomiting: {'Yes' if vomiting else 'No'}")
+        st.write(f"Rash: {'Yes' if rash else 'No'} | Breathing Problem: {'Yes' if breathing else 'No'}")
 
-    st.subheader("💊 Prescription")
-    st.info(prescription)
+        st.write(f"**Predicted Disease:** {disease}")
+        st.write(f"**Prediction Confidence:** {confidence:.2f}%")
 
-    # -----------------------------------
-    # Download Report
-    # -----------------------------------
-    report_text = f"""
+        st.subheader("?? Prescription")
+        for item in prescription:
+            st.markdown(f"- {item}")
+
+        st.warning(
+            "?? This prediction is for educational purposes only and not for real-life medical diagnosis. Please consult a qualified doctor."
+        )
+
+        # -------------------------
+        # DOWNLOADABLE REPORT
+        # -------------------------
+        report_text = f"""
 AI Healthcare Medical Report
 -----------------------------
 Date: {datetime.now().strftime("%d-%m-%Y %H:%M")}
 
 Patient Name: {name}
 Age: {age}
+Gender: {gender_option}
+
+Symptoms:
+Fever: {'Yes' if fever else 'No'}
+Cough: {'Yes' if cough else 'No'}
+Headache: {'Yes' if headache else 'No'}
+Sore Throat: {'Yes' if soreThroat else 'No'}
+Body Pain: {'Yes' if bodyPain else 'No'}
+Vomiting: {'Yes' if vomiting else 'No'}
+Rash: {'Yes' if rash else 'No'}
+Breathing Problem: {'Yes' if breathing else 'No'}
+
 Predicted Disease: {disease}
+Prediction Confidence: {confidence:.2f}%
 
 Prescription:
-{prescription}
+{', '.join(prescription)}
+
+Disclaimer:
+This prediction is for educational purposes only. Always consult a qualified doctor.
 """
 
-    st.download_button(
-        label="⬇ Download Report",
-        data=report_text,
-        file_name="medical_report.txt",
-        mime="text/plain"
-    )
+        st.download_button(
+            label="? Download Report",
+            data=report_text,
+            file_name="medical_report.txt",
+            mime="text/plain"
+        )
 
-# -----------------------------------
-# About Section
-# -----------------------------------
-st.markdown("---")
-st.subheader("📖 About This Project")
-
-st.write("""
-This project uses Machine Learning (Random Forest Algorithm) 
-to predict diseases based on patient symptoms.
-
-It helps in early detection and provides quick medical guidance.
-""")
-
-st.subheader("🚀 Future Scope")
-
-st.write("""
-- Add more diseases
-- Improve dataset size
-- Connect with hospital database
-- Convert into mobile application
-""")
-
-# -----------------------------------
-# Prediction Section
-# -----------------------------------
-if st.button("🧾 Generate Medical Report"):
-
-    input_data = [[age, gender, fever, cough, headache,
-                   soreThroat, bodyPain, vomiting, rash, breathing]]
-
-    prediction = model.predict(input_data)
-    disease = le.inverse_transform(prediction)[0]
-
-    # Prescription dictionary
-    prescription_dict = {
-        "COVID-19": "Isolation, Paracetamol, Steam inhalation, Doctor consultation",
-        "Dengue": "Hydration, Paracetamol (No aspirin), Rest",
-        "Malaria": "Antimalarial drugs, Hydration, Doctor supervision",
-        "Flu": "Rest, Fluids, Paracetamol",
-        "Cold": "Steam inhalation, Warm fluids, Rest",
-        "Typhoid": "Antibiotics (Doctor prescribed), Hydration, Soft diet"
-    }
-
-    prescription = prescription_dict.get(disease, "Consult Doctor")
-
-    st.success("Prediction Complete ✅")
-
-    # -----------------------------------
-    # Report Section
-    # -----------------------------------
-    st.subheader("📋 Medical Report")
-
-    st.write("Date:", datetime.now().strftime("%d-%m-%Y %H:%M"))
-    st.write("Patient Name:", name)
-    st.write("Age:", age)
-    st.write("Predicted Disease:", disease)
-
-    st.subheader("💊 Prescription")
-    st.info(prescription)
-
-    # -----------------------------------
-    # Download Report
-    # -----------------------------------
-    report_text = f"""
-AI Healthcare Medical Report
------------------------------
-Date: {datetime.now().strftime("%d-%m-%Y %H:%M")}
-
-Patient Name: {name}
-Age: {age}
-Predicted Disease: {disease}
-
-Prescription:
-{prescription}
-"""
-
-    st.download_button(
-        label="⬇ Download Report",
-        data=report_text,
-        file_name="medical_report.txt",
-        mime="text/plain"
-    )
-
-# -----------------------------------
-# About Section
-# -----------------------------------
-st.markdown("---")
-st.subheader("📖 About This Project")
-
-st.write("""
-This project uses Machine Learning (Random Forest Algorithm) 
-to predict diseases based on patient symptoms.
-
-It helps in early detection and provides quick medical guidance.
-""")
-
-st.subheader("🚀 Future Scope")
-
-st.write("""
-- Add more diseases
-- Improve dataset size
-- Connect with hospital database
-- Convert into mobile application
-""")
-
+        # -------------------------
+        # SATISFYING END MESSAGE
+        # -------------------------
+        st.balloons()
+        st.success("?? Report Generated Successfully! Thank you for using the AI Healthcare System. Stay safe! ?")
