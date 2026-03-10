@@ -254,4 +254,5 @@ st.markdown("<div class='card-title'>💚 Stay Healthy</div>", unsafe_allow_html
 
 st.success("Your health is important. Early diagnosis helps prevent serious diseases. Maintain a healthy lifestyle and consult doctors when needed.")
 
+
 st.markdown("</div>", unsafe_allow_html=True)
