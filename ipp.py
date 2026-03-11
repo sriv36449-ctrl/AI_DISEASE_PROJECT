@@ -1,134 +1,112 @@
 import streamlit as st
 from reportlab.pdfgen import canvas
 
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Smart Healthcare System", page_icon="🏥", layout="wide")
 
-# ---------------- UI DESIGN ----------------
-
+# ---------------- UI STYLE ----------------
 st.markdown("""
 <style>
 
 .stApp{
-background: linear-gradient(135deg,#e0f2ff,#b9e6ff,#dff4ff);
-color:#1e3a8a;
+background-color:#d6f0ff;
 }
 
 .title{
 text-align:center;
 font-size:50px;
-color:#1e3a8a;
+color:#003366;
 font-weight:bold;
 }
 
 .subtitle{
 text-align:center;
-color:#1e3a8a;
+color:#003366;
 font-size:20px;
-margin-bottom:40px;
+margin-bottom:30px;
 }
 
 .card{
 background:white;
 padding:25px;
 border-radius:15px;
-box-shadow:0px 4px 20px rgba(0,0,0,0.15);
+box-shadow:0px 4px 15px rgba(0,0,0,0.1);
 margin-bottom:25px;
-animation: fade 1s;
-}
-
-@keyframes fade{
-0%{opacity:0}
-100%{opacity:1}
 }
 
 .card-title{
 font-size:24px;
-color:#1e3a8a;
+color:#003366;
 margin-bottom:10px;
 font-weight:bold;
 }
 
 .stButton>button{
-background:#ef4444;
+background:red;
 color:white;
 border-radius:10px;
 height:40px;
 font-weight:bold;
 }
 
-strong{
-color:#ef4444;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<div class='title'>🏥 Smart AI Healthcare Assistant</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Advanced Digital Hospital Platform</div>", unsafe_allow_html=True)
+# ---------------- TITLE ----------------
 
-# ---------------- SYMPTOMS ----------------
+st.markdown("<div class='title'>🏥 Smart AI Healthcare Assistant</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Advanced Digital Healthcare Platform</div>", unsafe_allow_html=True)
+
+# ---------------- SYMPTOM CHECKER ----------------
 
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div class='card-title'>🩺 Symptom Checker</div>", unsafe_allow_html=True)
 
 symptoms = [
 "Fever","Cough","Headache","Fatigue","Stomach Pain","Sore Throat","Runny Nose",
-"Chest Pain","Shortness of Breath","Dizziness","Nausea","Vomiting","Body Pain",
-"Chills","Loss of Appetite","Sweating","Muscle Pain","Joint Pain","Back Pain",
-"Blurred Vision","Ear Pain","Skin Rash","Diarrhea","Constipation","Heartburn",
-"Weight Loss","Weight Gain","Insomnia","Anxiety","Depression","Palpitations",
-"Swelling","Frequent Urination","Burning Urination","Dry Mouth","Hair Loss",
-"Itching","Red Eyes","Sneezing","Numbness"
+"Chest Pain","Shortness of Breath","Dizziness","Nausea","Vomiting",
+"Sneezing","Body Pain"
 ]
 
 selected = st.multiselect("Select Symptoms", symptoms)
 
-disease="General Checkup Recommended"
-risk="Low"
+disease=""
+prescription=""
 
-if st.button("Predict Disease"):
+if selected:
 
     if "Fever" in selected and "Cough" in selected:
         disease="Flu"
+        prescription="Paracetamol, Vitamin C, Rest"
 
     elif "Runny Nose" in selected and "Sneezing" in selected:
         disease="Common Cold"
+        prescription="Cetirizine, Steam inhalation"
 
     elif "Headache" in selected and "Nausea" in selected:
         disease="Migraine"
+        prescription="Ibuprofen, Rest in dark room"
 
-    elif "Stomach Pain" in selected and "Heartburn" in selected:
-        disease="Gastric Infection"
-
-    elif "Vomiting" in selected and "Diarrhea" in selected:
+    elif "Stomach Pain" in selected and "Vomiting" in selected:
         disease="Food Poisoning"
-
-    elif "Frequent Urination" in selected and "Weight Loss" in selected:
-        disease="Possible Diabetes"
+        prescription="ORS, Antacid, Hydration"
 
     elif "Chest Pain" in selected and "Shortness of Breath" in selected:
         disease="Possible Heart Disease"
+        prescription="Immediate cardiologist consultation"
 
-    elif "Skin Rash" in selected and "Itching" in selected:
-        disease="Skin Allergy"
+    if disease!="":
+        st.success(f"Predicted Disease: {disease}")
 
-    elif "Red Eyes" in selected and "Blurred Vision" in selected:
-        disease="Eye Infection"
+st.markdown("</div>", unsafe_allow_html=True)
 
-    elif "Burning Urination" in selected and "Frequent Urination" in selected:
-        disease="Urinary Tract Infection"
+# ---------------- PATIENT DETAILS ----------------
 
-    symptom_count=len(selected)
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("<div class='card-title'>👤 Patient Details</div>", unsafe_allow_html=True)
 
-    if symptom_count<=3:
-        risk="Low"
-    elif symptom_count<=6:
-        risk="Medium"
-    else:
-        risk="High"
-
-    st.warning(f"Possible Condition: {disease}")
-    st.info(f"Risk Level: {risk}")
+name = st.text_input("Patient Name")
+age = st.number_input("Age",1,120)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -137,72 +115,39 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div class='card-title'>📄 Medical Report</div>", unsafe_allow_html=True)
 
-name=st.text_input("Patient Name")
-age=st.number_input("Age",1,120)
-
-if st.button("Generate Medical Report"):
-
-    st.success("Medical Report Generated")
-
-    st.write("Patient Name:",name)
-    st.write("Age:",age)
-    st.write("Symptoms:",selected)
-    st.write("Predicted Disease:",disease)
-    st.write("Risk Level:",risk)
+if st.button("Generate Medical Report") and disease!="":
 
     pdf="medical_report.pdf"
 
     c=canvas.Canvas(pdf)
 
-    c.drawString(100,750,"SMART HEALTHCARE REPORT")
-    c.drawString(100,700,f"Name: {name}")
-    c.drawString(100,680,f"Age: {age}")
-    c.drawString(100,660,f"Symptoms: {', '.join(selected)}")
-    c.drawString(100,640,f"Disease: {disease}")
-    c.drawString(100,620,f"Risk Level: {risk}")
+    c.drawString(100,750,"SMART HEALTHCARE MEDICAL REPORT")
+    c.drawString(100,720,f"Patient Name: {name}")
+    c.drawString(100,700,f"Age: {age}")
+    c.drawString(100,680,f"Symptoms: {', '.join(selected)}")
+    c.drawString(100,660,f"Predicted Disease: {disease}")
+    c.drawString(100,640,f"Prescription: {prescription}")
 
     c.save()
+
+    st.success("Medical report generated successfully")
 
     with open(pdf,"rb") as f:
         st.download_button("Download Medical Report",f,"medical_report.pdf")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------------- PRESCRIPTION ----------------
-
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("<div class='card-title'>💊 Prescription</div>", unsafe_allow_html=True)
-
-condition=st.selectbox("Select Condition",
-["Flu","Cold","Migraine","Gastric Infection","Food Poisoning"])
-
-if condition=="Flu":
-    st.info("Tablets: Paracetamol, Vitamin C")
-
-elif condition=="Cold":
-    st.info("Tablets: Cetirizine")
-
-elif condition=="Migraine":
-    st.info("Tablets: Ibuprofen")
-
-elif condition=="Gastric Infection":
-    st.info("Tablets: Antacid")
-
-elif condition=="Food Poisoning":
-    st.info("Tablets: Oral Rehydration Salts")
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-# ---------------- APPOINTMENT ----------------
+# ---------------- DOCTOR APPOINTMENT ----------------
 
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div class='card-title'>📅 Doctor Appointment</div>", unsafe_allow_html=True)
 
-doctor=st.selectbox("Choose Specialist Doctor",
-["General Physician","Cardiologist","Neurologist","Pediatrician",
-"Gastroenterologist","Dermatologist","Orthopedic","Psychiatrist"])
+doctor = st.selectbox(
+"Choose Specialist Doctor",
+["General Physician","Cardiologist","Neurologist","Dermatologist"]
+)
 
-date=st.date_input("Appointment Date")
+date = st.date_input("Appointment Date")
 
 if st.button("Book Appointment"):
     st.success(f"Appointment booked with {doctor} on {date}")
@@ -214,21 +159,24 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div class='card-title'>🎥 Online Video Consultation</div>", unsafe_allow_html=True)
 
-col1,col2,col3=st.columns(3)
+col1,col2,col3 = st.columns(3)
 
 with col1:
+    st.image("https://cdn-icons-png.flaticon.com/512/3774/3774299.png", width=100)
     st.subheader("👨‍⚕️ Dr Smith")
     st.write("General Physician")
-    st.success("Online")
+    st.success("Available")
     st.markdown("[Start Video Call](https://meet.google.com/)")
 
 with col2:
+    st.image("https://cdn-icons-png.flaticon.com/512/3774/3774361.png", width=100)
     st.subheader("👩‍⚕️ Dr Emily")
     st.write("Cardiologist")
-    st.success("Online")
+    st.success("Available")
     st.markdown("[Start Video Call](https://zoom.us/)")
 
 with col3:
+    st.image("https://cdn-icons-png.flaticon.com/512/3774/3774296.png", width=100)
     st.subheader("👨‍⚕️ Dr John")
     st.write("Neurologist")
     st.warning("Offline")
@@ -247,12 +195,11 @@ st.write("Emergency Contact: +123456789")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------------- POSITIVE MESSAGE ----------------
+# ---------------- HEALTH MESSAGE ----------------
 
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div class='card-title'>💚 Stay Healthy</div>", unsafe_allow_html=True)
 
-st.success("Your health is important. Early diagnosis helps prevent serious diseases. Maintain a healthy lifestyle and consult doctors when needed.")
-
+st.success("Your health is important. Early diagnosis helps prevent serious diseases.")
 
 st.markdown("</div>", unsafe_allow_html=True)
