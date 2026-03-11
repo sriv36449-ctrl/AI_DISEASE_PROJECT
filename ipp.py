@@ -1,10 +1,10 @@
 import streamlit as st
 from reportlab.pdfgen import canvas
 
-# ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Smart Healthcare System", page_icon="🏥", layout="wide")
 
-# ---------------- UI STYLE ----------------
+# ---------------- STYLE ----------------
+
 st.markdown("""
 <style>
 
@@ -63,9 +63,9 @@ st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div class='card-title'>🩺 Symptom Checker</div>", unsafe_allow_html=True)
 
 symptoms = [
-"Fever","Cough","Headache","Fatigue","Stomach Pain","Sore Throat","Runny Nose",
-"Chest Pain","Shortness of Breath","Dizziness","Nausea","Vomiting",
-"Sneezing","Body Pain"
+"Fever","Cough","Headache","Fatigue","Stomach Pain","Sore Throat",
+"Runny Nose","Chest Pain","Shortness of Breath","Dizziness",
+"Nausea","Vomiting","Sneezing","Body Pain"
 ]
 
 selected = st.multiselect("Select Symptoms", symptoms)
@@ -73,7 +73,9 @@ selected = st.multiselect("Select Symptoms", symptoms)
 disease=""
 prescription=""
 
-if selected:
+# ---------------- PREDICT BUTTON ----------------
+
+if st.button("Predict Disease"):
 
     if "Fever" in selected and "Cough" in selected:
         disease="Flu"
@@ -85,11 +87,11 @@ if selected:
 
     elif "Headache" in selected and "Nausea" in selected:
         disease="Migraine"
-        prescription="Ibuprofen, Rest in dark room"
+        prescription="Ibuprofen, Rest"
 
     elif "Stomach Pain" in selected and "Vomiting" in selected:
         disease="Food Poisoning"
-        prescription="ORS, Antacid, Hydration"
+        prescription="ORS, Antacid"
 
     elif "Chest Pain" in selected and "Shortness of Breath" in selected:
         disease="Possible Heart Disease"
@@ -130,7 +132,7 @@ if st.button("Generate Medical Report") and disease!="":
 
     c.save()
 
-    st.success("Medical report generated successfully")
+    st.success("Medical Report Generated")
 
     with open(pdf,"rb") as f:
         st.download_button("Download Medical Report",f,"medical_report.pdf")
