@@ -1,5 +1,4 @@
 import streamlit as st
-from reportlab.pdfgen import canvas
 
 st.set_page_config(page_title="Smart Healthcare System", page_icon="🏥", layout="wide")
 
@@ -81,31 +80,35 @@ symptoms = [
 
 selected = st.multiselect("Select Symptoms", symptoms)
 
-# ---------------- PREDICT BUTTON ----------------
+# ---------------- PREDICT DISEASE ----------------
 
 if st.button("Predict Disease"):
 
     if "Fever" in selected and "Cough" in selected:
-        st.session_state.disease = "Flu"
-        st.session_state.prescription = "Paracetamol, Vitamin C, Rest"
+        st.session_state.disease="Flu"
+        st.session_state.prescription="Paracetamol, Vitamin C, Rest"
 
     elif "Runny Nose" in selected and "Sneezing" in selected:
-        st.session_state.disease = "Common Cold"
-        st.session_state.prescription = "Cetirizine, Steam inhalation"
+        st.session_state.disease="Common Cold"
+        st.session_state.prescription="Cetirizine, Steam inhalation"
 
     elif "Headache" in selected and "Nausea" in selected:
-        st.session_state.disease = "Migraine"
-        st.session_state.prescription = "Ibuprofen, Rest"
+        st.session_state.disease="Migraine"
+        st.session_state.prescription="Ibuprofen, Rest"
 
     elif "Stomach Pain" in selected and "Vomiting" in selected:
-        st.session_state.disease = "Food Poisoning"
-        st.session_state.prescription = "ORS, Antacid"
+        st.session_state.disease="Food Poisoning"
+        st.session_state.prescription="ORS, Antacid"
 
     elif "Chest Pain" in selected and "Shortness of Breath" in selected:
-        st.session_state.disease = "Possible Heart Disease"
-        st.session_state.prescription = "Immediate cardiologist consultation"
+        st.session_state.disease="Possible Heart Disease"
+        st.session_state.prescription="Immediate cardiologist consultation"
 
-    st.session_state.predicted = True
+    else:
+        st.session_state.disease="General Checkup Recommended"
+        st.session_state.prescription="Consult a doctor for further diagnosis"
+
+    st.session_state.predicted=True
 
     st.success(f"Predicted Disease: {st.session_state.disease}")
 
@@ -123,23 +126,15 @@ if st.session_state.predicted:
 
     if st.button("Generate Medical Report"):
 
-        pdf = "medical_report.pdf"
-
-        c = canvas.Canvas(pdf)
-
-        c.drawString(100,750,"SMART HEALTHCARE MEDICAL REPORT")
-        c.drawString(100,720,f"Patient Name: {name}")
-        c.drawString(100,700,f"Age: {age}")
-        c.drawString(100,680,f"Symptoms: {', '.join(selected)}")
-        c.drawString(100,660,f"Predicted Disease: {st.session_state.disease}")
-        c.drawString(100,640,f"Prescription: {st.session_state.prescription}")
-
-        c.save()
-
         st.success("Medical Report Generated Successfully")
 
-        with open(pdf,"rb") as f:
-            st.download_button("Download Medical Report",f,"medical_report.pdf")
+        st.subheader("Patient Medical Report")
+
+        st.write("Patient Name:", name)
+        st.write("Age:", age)
+        st.write("Symptoms:", ", ".join(selected))
+        st.write("Predicted Disease:", st.session_state.disease)
+        st.write("Prescription:", st.session_state.prescription)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
