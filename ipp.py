@@ -3,6 +3,17 @@ from reportlab.pdfgen import canvas
 
 st.set_page_config(page_title="Smart Healthcare System", page_icon="🏥", layout="wide")
 
+# ---------------- SESSION STATE ----------------
+
+if "predicted" not in st.session_state:
+    st.session_state.predicted = False
+
+if "disease" not in st.session_state:
+    st.session_state.disease = ""
+
+if "prescription" not in st.session_state:
+    st.session_state.prescription = ""
+
 # ---------------- STYLE ----------------
 
 st.markdown("""
@@ -70,45 +81,33 @@ symptoms = [
 
 selected = st.multiselect("Select Symptoms", symptoms)
 
-disease=""
-prescription=""
-
 # ---------------- PREDICT BUTTON ----------------
 
 if st.button("Predict Disease"):
 
     if "Fever" in selected and "Cough" in selected:
-        disease="Flu"
-        prescription="Paracetamol, Vitamin C, Rest"
+        st.session_state.disease = "Flu"
+        st.session_state.prescription = "Paracetamol, Vitamin C, Rest"
 
     elif "Runny Nose" in selected and "Sneezing" in selected:
-        disease="Common Cold"
-        prescription="Cetirizine, Steam inhalation"
+        st.session_state.disease = "Common Cold"
+        st.session_state.prescription = "Cetirizine, Steam inhalation"
 
     elif "Headache" in selected and "Nausea" in selected:
-        disease="Migraine"
-        prescription="Ibuprofen, Rest"
+        st.session_state.disease = "Migraine"
+        st.session_state.prescription = "Ibuprofen, Rest"
 
     elif "Stomach Pain" in selected and "Vomiting" in selected:
-        disease="Food Poisoning"
-        prescription="ORS, Antacid"
+        st.session_state.disease = "Food Poisoning"
+        st.session_state.prescription = "ORS, Antacid"
 
     elif "Chest Pain" in selected and "Shortness of Breath" in selected:
-        disease="Possible Heart Disease"
-        prescription="Immediate cardiologist consultation"
+        st.session_state.disease = "Possible Heart Disease"
+        st.session_state.prescription = "Immediate cardiologist consultation"
 
-    if disease!="":
-        st.success(f"Predicted Disease: {disease}")
+    st.session_state.predicted = True
 
-st.markdown("</div>", unsafe_allow_html=True)
-
-# ---------------- PATIENT DETAILS ----------------
-
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("<div class='card-title'>👤 Patient Details</div>", unsafe_allow_html=True)
-
-name = st.text_input("Patient Name")
-age = st.number_input("Age",1,120)
+    st.success(f"Predicted Disease: {st.session_state.disease}")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -117,25 +116,30 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div class='card-title'>📄 Medical Report</div>", unsafe_allow_html=True)
 
-if st.button("Generate Medical Report") and disease!="":
+if st.session_state.predicted:
 
-    pdf="medical_report.pdf"
+    name = st.text_input("Patient Name")
+    age = st.number_input("Age",1,120)
 
-    c=canvas.Canvas(pdf)
+    if st.button("Generate Medical Report"):
 
-    c.drawString(100,750,"SMART HEALTHCARE MEDICAL REPORT")
-    c.drawString(100,720,f"Patient Name: {name}")
-    c.drawString(100,700,f"Age: {age}")
-    c.drawString(100,680,f"Symptoms: {', '.join(selected)}")
-    c.drawString(100,660,f"Predicted Disease: {disease}")
-    c.drawString(100,640,f"Prescription: {prescription}")
+        pdf = "medical_report.pdf"
 
-    c.save()
+        c = canvas.Canvas(pdf)
 
-    st.success("Medical Report Generated")
+        c.drawString(100,750,"SMART HEALTHCARE MEDICAL REPORT")
+        c.drawString(100,720,f"Patient Name: {name}")
+        c.drawString(100,700,f"Age: {age}")
+        c.drawString(100,680,f"Symptoms: {', '.join(selected)}")
+        c.drawString(100,660,f"Predicted Disease: {st.session_state.disease}")
+        c.drawString(100,640,f"Prescription: {st.session_state.prescription}")
 
-    with open(pdf,"rb") as f:
-        st.download_button("Download Medical Report",f,"medical_report.pdf")
+        c.save()
+
+        st.success("Medical Report Generated Successfully")
+
+        with open(pdf,"rb") as f:
+            st.download_button("Download Medical Report",f,"medical_report.pdf")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -165,21 +169,21 @@ col1,col2,col3 = st.columns(3)
 
 with col1:
     st.image("https://cdn-icons-png.flaticon.com/512/3774/3774299.png", width=100)
-    st.subheader("👨‍⚕️ Dr Smith")
+    st.subheader("Dr Smith")
     st.write("General Physician")
     st.success("Available")
     st.markdown("[Start Video Call](https://meet.google.com/)")
 
 with col2:
     st.image("https://cdn-icons-png.flaticon.com/512/3774/3774361.png", width=100)
-    st.subheader("👩‍⚕️ Dr Emily")
+    st.subheader("Dr Emily")
     st.write("Cardiologist")
     st.success("Available")
     st.markdown("[Start Video Call](https://zoom.us/)")
 
 with col3:
     st.image("https://cdn-icons-png.flaticon.com/512/3774/3774296.png", width=100)
-    st.subheader("👨‍⚕️ Dr John")
+    st.subheader("Dr John")
     st.write("Neurologist")
     st.warning("Offline")
 
